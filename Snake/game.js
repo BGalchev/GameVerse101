@@ -2,14 +2,17 @@ window.addEventListener('load', () => {
     const canvas = document.querySelector('#snake');
     const context = canvas.getContext('2d');
     const gridSize = 50;
+    const delay = 200
 
     const canvasWidthInBlocks = Math.floor(canvas.width / gridSize);
     const canvasHeightInBlocks = Math.floor(canvas.height / gridSize);
 
     let snake = [{ x: 0, y: 0, width: gridSize, height: gridSize }];
     let direction = 'down';
+    let nextDirection = 'down'; // Store the next direction to be applied
     let score = 0;
     let apple = { x: 0, y: 0, size: gridSize };
+    let isGameOver = false;
 
     function drawGrid() {
         // Draw the grid lines on the canvas
@@ -42,23 +45,29 @@ window.addEventListener('load', () => {
     }
 
     function handleInput(event) {
-        // Update the direction based on user input
+        // Restart the game if it's over and any key is pressed
+        if (isGameOver) {
+            resetGame();
+            return;
+        }
+
+        // Update the next direction based on user input
         switch (event.key) {
             case 'ArrowUp':
                 if (direction !== 'down')
-                    direction = 'up';
+                    nextDirection = 'up';
                 break;
             case 'ArrowDown':
                 if (direction !== 'up')
-                    direction = 'down';
+                    nextDirection = 'down';
                 break;
             case 'ArrowLeft':
                 if (direction !== 'right')
-                    direction = 'left';
+                    nextDirection = 'left';
                 break;
             case 'ArrowRight':
                 if (direction !== 'left')
-                    direction = 'right';
+                    nextDirection = 'right';
                 break;
         }
     }
@@ -76,7 +85,7 @@ window.addEventListener('load', () => {
             gameOver();
         }
 
-        // Check collision with itself
+        // Check collision with itself (excluding the head)
         for (let i = 1; i < snake.length; i++) {
             const segment = snake[i];
             if (head.x === segment.x && head.y === segment.y) {
@@ -88,15 +97,26 @@ window.addEventListener('load', () => {
         if (head.x === apple.x * gridSize && head.y === apple.y * gridSize) {
             // Snake has collided with an apple
             score++;
-            generateRandomApple();
             growSnake();
+            generateRandomApple();
         }
     }
 
     function generateRandomApple() {
-        // Generate random coordinates for the apple within the canvas grid
-        apple.x = Math.floor(Math.random() * canvasWidthInBlocks);
-        apple.y = Math.floor(Math.random() * canvasHeightInBlocks);
+        let appleX, appleY;
+        let isSnakeOverlap = true;
+
+        // Keep generating random coordinates until a valid spot is found
+        while (isSnakeOverlap) {
+            appleX = Math.floor(Math.random() * canvasWidthInBlocks);
+            appleY = Math.floor(Math.random() * canvasHeightInBlocks);
+
+            // Check if the generated apple coordinates overlap with the snake's body
+            isSnakeOverlap = snake.some((segment) => segment.x === appleX && segment.y === appleY);
+        }
+
+        apple.x = appleX;
+        apple.y = appleY;
     }
 
     function growSnake() {
@@ -106,23 +126,43 @@ window.addEventListener('load', () => {
     }
 
     function gameOver() {
-        // Display game over message with the score and reset the game
-        alert(`Game over!\nYour score is ${score}!`);
-        resetGame();
+        // Set the game over flag and redraw the game over message
+        isGameOver = true;
+        context.font = '40px Arial';
+        context.fillStyle = 'white';
+        context.fillText('Game Over!', canvas.width / 2 - 100, canvas.height / 2);
+        context.font = '20px Arial';
+        context.fillText('Click any key to restart', canvas.width / 2 - 100, canvas.height / 2 + 30);
+
     }
 
     function resetGame() {
-        // Reset the snake, direction, score, and generate a new apple
+        // Reset the snake length and generate a new apple
         snake = [{ x: 0, y: 0, width: gridSize, height: gridSize }];
         direction = 'down';
+        nextDirection = 'down';
         score = 0;
         generateRandomApple();
+        isGameOver = false;
+        delay = 200;
+        gameLoop(); // Start the game loop
     }
+
 
     function gameLoop() {
         const head = snake[0];
         let newX = head.x;
         let newY = head.y;
+
+        // Update the direction based on the nextDirection if it's a valid direction
+        if (
+            (nextDirection === 'up' && direction !== 'down') ||
+            (nextDirection === 'down' && direction !== 'up') ||
+            (nextDirection === 'left' && direction !== 'right') ||
+            (nextDirection === 'right' && direction !== 'left')
+        ) {
+            direction = nextDirection;
+        }
 
         // Update the head position based on the current direction
         if (direction === 'up') {
@@ -137,16 +177,31 @@ window.addEventListener('load', () => {
 
         const newHead = { x: newX, y: newY, width: gridSize, height: gridSize };
 
-        // Update the snake by adding a new head segment and removing the tail segment
-        snake.unshift(newHead);
-        snake.pop();
+        // Check if the new position is valid (not colliding with the snake's body)
+        const isPositionValid = !snake.some((segment, index) => index !== 0 && segment.x === newX && segment.y === newY);
+
+        // Update the snake only if the new position is valid
+        if (isPositionValid) {
+            snake.unshift(newHead);
+            snake.pop();
+        } else {
+            gameOver();
+            return;
+        }
 
         updateSnakePosition();
         checkCollision();
         spawnApples();
 
-        setTimeout(gameLoop, 180); // Introduce a delay of 180 milliseconds (18 frames per second)
+        setTimeout(gameLoop, delay); // Introduce a delay of 200 milliseconds (5 frames per second)
     }
+
+    canvas.addEventListener('click', () => {
+        if (isGameOver) {
+            resetGame();
+            gameLoop();
+        }
+    });
 
     document.addEventListener('keydown', handleInput);
 
