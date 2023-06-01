@@ -15,9 +15,29 @@ p {
 }
 
 h1:hover,
-p:hover {
+p:hover,
+#game-score:hover{
     color: aqua;
 }
+
+
+#score-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#game-score {
+  padding: 0;
+  margin: 0;
+  height: 2rem;
+  width: 15rem;
+  color: black;
+  text-align: center;
+  font-size: 1.5rem;
+  font-family: "Times New Roman", Times, serif;
+}
+
 
 canvas {
     margin: 10px;

@@ -14,6 +14,11 @@ window.addEventListener('load', () => {
   let isGameOver = false;
   let gameTimer = null; 
 
+  function updateGameScore(score){
+    let scoreElement = document.getElementById('game-score');
+    scoreElement.textContent =`Apples eaten: ${score}`
+  }
+
   function drawGrid() {
     // Draw the grid lines on the canvas
     context.strokeStyle = 'black';
@@ -25,12 +30,26 @@ window.addEventListener('load', () => {
     }
   }
 
+  function gameWon(){
+    isGameOver = true;
+    context.font = '40px Arial';
+    context.fillStyle = 'white';
+    context.fillText(`You WON! Score: ${score}`, canvas.width / 2 - 200, canvas.height / 2);
+    context.font = '20px Arial';
+    context.fillText('Click any key to play again!', canvas.width / 2 - 100, canvas.height / 2 + 30);
+
+    // Listen for any keydown event to restart the game
+    document.addEventListener('keydown', restartGame);
+  }
+
+
+
  function gameOver() {
     // Set the game over flag and redraw the game over message
     isGameOver = true;
     context.font = '40px Arial';
     context.fillStyle = 'white';
-    context.fillText('Game Over!', canvas.width / 2 - 100, canvas.height / 2);
+    context.fillText(`Game Over! Score: ${score}`, canvas.width / 2 - 200, canvas.height / 2);
     context.font = '20px Arial';
     context.fillText('Click any key to restart', canvas.width / 2 - 100, canvas.height / 2 + 30);
 
@@ -40,7 +59,9 @@ window.addEventListener('load', () => {
   }
 
   function restartGame(event) {
-    clearTimeout(gameTimer);
+    clearTimeout(gameTimer); 
+    score = 0;
+    updateGameScore(score);
     // Check if the game is over and a key is pressed
     if (isGameOver) {
       // Remove the event listener
@@ -185,6 +206,7 @@ function handleInput(event) {
     if (head.x === apple.x * gridSize && head.y === apple.y * gridSize) {
       // Snake has collided with an apple
       score++;
+     updateGameScore(score); 
       growSnake();
       generateRandomApple();
       return;
@@ -200,9 +222,14 @@ function handleInput(event) {
 
 
   function growSnake() {
-    // Add a new segment to the snake, extending its length
+    if(snake.length < 143){
+   // Add a new segment to the snake, extending its length
     const tail = snake[snake.length - 1];
     snake.push({ x: tail.x, y: tail.y, width: gridSize, height: gridSize });
+    }else{
+      gameWon()
+    }
+ 
   }
 
   document.addEventListener('keydown', handleInput);
