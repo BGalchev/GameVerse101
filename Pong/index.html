@@ -1,17 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pong Game</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            background: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #score-container {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #score1 {
+            margin: 0 25rem 0 0;
+            font-size: 2rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        #score2 {
+            margin: 0 0 0 0;
+            font-size: 2rem;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+    <script src="game.js" defer></script>
 </head>
 
 <body>
-    <canvas id="canvas"></canvas>
-    <script src="game.js"></script>
+    <div id="score-container">
+        <div id="score1">Score: 0 </div>
+        <div id="score2">Score: 0 </div>
+    </div>
+
+    <canvas width="750" height="585" id="game"></canvas>
 </body>
 
 </html>
