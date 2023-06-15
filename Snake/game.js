@@ -85,6 +85,28 @@ function gameOver() {
     }
   }
 
+function handleInput(event) {
+    // Update the next direction based on user input
+    switch (event.key) {
+      case 'ArrowUp':
+        if (direction !== 'down')
+          nextDirection = 'up';
+        break;
+      case 'ArrowDown':
+        if (direction !== 'up')
+          nextDirection = 'down';
+        break;
+      case 'ArrowLeft':
+        if (direction !== 'right')
+          nextDirection = 'left';
+        break;
+      case 'ArrowRight':
+        if (direction !== 'left')
+          nextDirection = 'right';
+        break;
+    }
+  }
+
   function gameLoop() {
     const head = snake[0];
     let newX = head.x;
@@ -127,28 +149,6 @@ function gameOver() {
     spawnApples();
 
     gameTimer = setTimeout(gameLoop, 200); // Introduce a delay of 200 milliseconds (5 frames per second)
-  }
-
-  function handleInput(event) {
-    // Update the next direction based on user input
-    switch (event.key) {
-      case 'ArrowUp':
-        if (direction !== 'down')
-          nextDirection = 'up';
-        break;
-      case 'ArrowDown':
-        if (direction !== 'up')
-          nextDirection = 'down';
-        break;
-      case 'ArrowLeft':
-        if (direction !== 'right')
-          nextDirection = 'left';
-        break;
-      case 'ArrowRight':
-        if (direction !== 'left')
-          nextDirection = 'right';
-        break;
-    }
   }
 
 function getRandomInt(min, max) {
