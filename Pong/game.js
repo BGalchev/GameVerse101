@@ -43,6 +43,7 @@ const ball = {
 };
 
 // check for collision between two objects using axis-aligned bounding box (AABB)
+// https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
 function collides(obj1, obj2) {
     return (
         obj1.x < obj2.x + obj2.width &&
@@ -155,4 +156,4 @@ document.addEventListener('keyup', function (e) {
 });
 
 // start the game
- requestAnimationFrame(loop);
+requestAnimationFrame(loop);
